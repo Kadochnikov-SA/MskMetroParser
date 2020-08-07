@@ -9,17 +9,33 @@ import org.jsoup.select.Elements;
 import java.io.IOException;
 import java.util.ArrayList;
 
+/**
+ * This public class is used for connecting to the Wikipedia page and
+ * getting information about stations, lines, and transfers of the Moscow metro.
+ */
 public class ParserHtml {
 
-    private Document document = Jsoup.connect("https://ru.wikipedia.org/wiki/Список_станций_Московского_метрополитена").get();
+    private Document document;
     private ArrayList<Station> stationsWithTwoLines = new ArrayList<>();
 
     public ParserHtml() throws IOException {
+        try {
+            document = Jsoup.connect("https://ru.wikipedia.org/wiki/Список_станций_Московского_метрополитена").get();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
+    /**
+     * This public method gets ready-made information for the fields of the station object.
+     * Creates a list of these objects.
+     *
+     * @return A list of stations that have the fields name, line index,
+     * line name, and a line containing a description of the transfer.
+     */
     public ArrayList<Station> getStationsList() {
         ArrayList<Station> stations = new ArrayList<>();
-        ArrayList<Element> lines = getLinesFromTables(document);
+        ArrayList<Element> lines = getFieldsFromTables(document);
         ArrayList<String> stationNames = new ArrayList<>(getStationName(lines));
         ArrayList<String> lineIndexes = new ArrayList<>(getLineIndex(lines));
         ArrayList<String> lineNames = new ArrayList<>(getLineName(lines));
@@ -37,6 +53,15 @@ public class ParserHtml {
     }
 
 
+    /**
+     * This public method gets information about possible transfers between
+     * stations from the web page code. Information about the transfer is stored
+     * in a single line and requires further processing.
+     *
+     * @param elementArrayList As a parameter, you get a ready-made list of fields from tables on
+     *                         the web page that describe stations.
+     * @return A ready-made list of lines that describe transfers between stations.
+     */
     private ArrayList<String> getConnectString(ArrayList<Element> elementArrayList) {
         ArrayList<String> connectStrings = new ArrayList<>();
         String connectString = null;
@@ -56,10 +81,15 @@ public class ParserHtml {
             }
         }
         return connectStrings;
-
     }
 
-
+    /**
+     * This method gets station names from fields in the table with General information about stations.
+     *
+     * @param elementArrayList As a parameter, you get a ready-made list of fields from tables on
+     *                         the web page that describe stations.
+     * @return Ready list of names of Moscow metro stations.
+     */
     private ArrayList<String> getLineName(ArrayList<Element> elementArrayList) {
         ArrayList<String> lineNames = new ArrayList<>();
         for (Element element : elementArrayList) {
@@ -72,6 +102,14 @@ public class ParserHtml {
         return lineNames;
     }
 
+
+    /**
+     * This method gets a list of station names from the table fields on the web page.
+     *
+     * @param elementArrayList As a parameter, you get a ready-made list of fields from tables on
+     *                         the web page that describe stations.
+     * @return List of names of Moscow metro lines.
+     */
     private ArrayList<String> getStationName(ArrayList<Element> elementArrayList) {
         ArrayList<String> nameList = new ArrayList<>();
         for (Element element : elementArrayList) {
@@ -82,6 +120,13 @@ public class ParserHtml {
         return nameList;
     }
 
+    /**
+     * This method gets a list of indexes for all Moscow metro lines.
+     *
+     * @param elementArrayList As a parameter, you get a ready-made list of fields from tables on
+     *                         the web page that describe stations.
+     * @return A list of indices of all lines of the Moscow metro.
+     */
     private ArrayList<String> getLineIndex(ArrayList<Element> elementArrayList) {
         ArrayList<String> indexList = new ArrayList<>();
         for (Element element : elementArrayList) {
@@ -97,7 +142,17 @@ public class ParserHtml {
     }
 
 
-    private ArrayList<Element> getLinesFromTables(Document document) {
+    /**
+     * This method retrieves fields in tables with information about stations.
+     * There are five tables on the Wikipedia page, but only the third, fourth,
+     * and fifth tables have the necessary information. These tables are obtained
+     * by index. Then you get a list of fields with only the necessary information.
+     * Auxiliary table fields are deleted.
+     *
+     * @param document A document containing the html code of the Wikipedia page.
+     * @return Full list of fields from all tables with information about Moscow metro stations.
+     */
+    private ArrayList<Element> getFieldsFromTables(Document document) {
         ArrayList<Element> elementArrayList = new ArrayList<>();
         Element table1 = document.select("table").get(3);
         Elements linesFromTable1 = table1.select("tr");
@@ -116,6 +171,13 @@ public class ParserHtml {
         return elementArrayList;
     }
 
+
+    /**
+     * This method gets information about stations that are located on two metro
+     * lines at the same time. There are only five such stations.
+     *
+     * @param tr Gets a table element with the tr tag as a parameter
+     */
     private void getStationsWithTwoLines(Element tr) {
         String lineIndex = null;
         String stationName = null;
@@ -138,12 +200,22 @@ public class ParserHtml {
         } else {
             connection = spanElement.attr("title");
         }
-        Station station = new Station(stationName,lineIndex,lineName,connection);
+        Station station = new Station(stationName, lineIndex, lineName, connection);
         stationsWithTwoLines.add(station);
     }
 
 
-    private String getConnectionStringFromTag (Elements elements) {
+    /**
+     * This method gets the lines describing the transplant directly from the code.
+     * The transfer can be between two, three or four stations. This method selects
+     * the desired number of stations participating in the transfer, and combines
+     * them into a single row.
+     *
+     * @param elements As a parameter, you get a ready-made list of fields from tables on
+     *                 the web page that describe stations.
+     * @return A line describing the transfer.
+     */
+    private String getConnectionStringFromTag(Elements elements) {
         String connectString = null;
         if (elements.size() == 4) {
             String element1 = elements.get(1).attr("title");
@@ -157,6 +229,4 @@ public class ParserHtml {
         }
         return connectString;
     }
-
-
 }

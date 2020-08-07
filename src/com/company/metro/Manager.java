@@ -2,6 +2,10 @@ package com.company.metro;
 
 import java.util.*;
 
+/**
+ * This class gets a list of stations when creating them, distributes
+ * them along lines, and creates transfer objects.
+ */
 public class Manager {
 
 
@@ -22,17 +26,29 @@ public class Manager {
         return stations;
     }
 
+    /**
+     * This method creates a list of line objects..
+     * @return List of objects line
+     */
     public ArrayList<Line> getLineList() {
         return getLines(stationArrayList);
     }
 
+    /**
+     * This method creates a list of all transfers.
+     * @return List that stores line objects
+     */
     public ArrayList<Connection> getConnectionsList() {
         ArrayList<Station> stations = new ArrayList<>(getConnectStationsList(stationArrayList));
         ArrayList<Connection> connections = new ArrayList<>(getConnections(stations));
         return connections;
     }
 
-
+    /**
+     * This method creates transfer
+     * @param stations Gets a list of stations
+     * @return List that stores transfer objects
+     */
     private ArrayList<Connection> getConnections(ArrayList<Station> stations) {
         ArrayList<Connection> connections = new ArrayList<>();
         for (Station station : stations) {
@@ -45,6 +61,14 @@ public class Manager {
         return connections;
     }
 
+    /**
+     * This method determines between which stations there is a transfer,
+     * and between which there is no transfer. Also checks that the same transfer
+     * is not added to the list twice.
+     * @param station A station that has an interchange with other stations.
+     * @param stations List of stations that have transfers.
+     * @return A list of stations that contains stations with a single transfer.
+     */
     private ArrayList<Station> getConnectStations(Station station, ArrayList<Station> stations) {
         ArrayList<Station> connectStations = new ArrayList<>();
         for (Station station1 : stations) {
@@ -60,7 +84,11 @@ public class Manager {
         return connectStations;
     }
 
-
+    /**
+     * This method gets inform
+     * @param stations Retrieves a list of all stations.
+     * @return List of objects of the line class
+     */
     private ArrayList<Line> getLines(ArrayList<Station> stations) {
         HashMap<String, String> linesFields = new HashMap<>();
         for (Station station : stations) {
@@ -73,6 +101,11 @@ public class Manager {
         return createLines(linesFields);
     }
 
+    /**
+     * This method creates objects of the line class from the received fields.
+     * @param hashMap Takes HashMap as a parameter where the key and value pair are fields for the line object.
+     * @return List of objects line
+     */
     private ArrayList<Line> createLines(HashMap<String,String> hashMap) {
         ArrayList<Line> lines = new ArrayList<>();
         ArrayList<String> indexList = new ArrayList<>(hashMap.keySet());
@@ -83,6 +116,11 @@ public class Manager {
         return lines;
     }
 
+    /**
+     * This method returns checks if a station has an interchange with other stations, it is added to the list.
+     * @param stations List of all stations
+     * @return List of stations that have transfers
+     */
     private ArrayList<Station> getConnectStationsList(ArrayList<Station> stations) {
         ArrayList<Station> connectStations = new ArrayList<>();
         for (Station station : stations) {

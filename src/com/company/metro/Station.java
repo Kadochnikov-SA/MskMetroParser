@@ -1,5 +1,9 @@
 package com.company.metro;
 
+/**
+ * This class describes the station. Stores the station name, line name,
+ * line index, and a string that describes the transfer between stations, if any.
+ */
 public class Station {
 
     private String name;

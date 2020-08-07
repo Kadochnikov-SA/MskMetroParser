@@ -10,6 +10,11 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+/**
+ * This class reads a file with Json objects, gets the necessary information from it,
+ * creates java line objects, and outputs a list of lines and the number of stations
+ * on each of them to the console
+ */
 public class SerializerFromFile {
 
     private String path;
@@ -18,6 +23,10 @@ public class SerializerFromFile {
         this.path = path;
     }
 
+    /**
+     * This method displays a list of Moscow metro lines in the console with the number
+     * of stations on each of them.
+     */
     public void printLines() throws JSONException {
         HashMap<String, Integer> lineMap = new HashMap<>(getNumberOfStations());
         ArrayList<String> names = new ArrayList<>(lineMap.keySet());
@@ -27,9 +36,15 @@ public class SerializerFromFile {
         }
     }
 
+    /**
+     * This method gets the information serializes the Json object in the list of Java objects
+     * of stations, counts their number for each line.
+     * @return Hash Map where the key is the name of the line, and the value is the number
+     * of stations on the line.
+     */
     private HashMap<String, Integer> getNumberOfStations() throws JSONException {
         HashMap<String, Integer> stationsMap = new HashMap<>();
-        ArrayList<Line> lines = new ArrayList<>(serializeLinesLinesToJsonObject());
+        ArrayList<Line> lines = new ArrayList<>(serializeLinesToJsonObject());
         JSONObject linesObject = createJSONObject().getJSONObject("Stations");
         for (Line line : lines) {
             JSONArray lineObject = linesObject.getJSONArray(line.getIndex());
@@ -38,7 +53,11 @@ public class SerializerFromFile {
         return stationsMap;
     }
 
-    private ArrayList<Line> serializeLinesLinesToJsonObject() throws JSONException {
+    /**
+     * This method gets a list of java station objects by serializing them from Json objects.
+     * @return List of all stations
+     */
+    private ArrayList<Line> serializeLinesToJsonObject() throws JSONException {
         ArrayList<Line> lines = new ArrayList<>();
         JSONObject jsonObject = createJSONObject();
         JSONArray lineArray = jsonObject.getJSONArray("Lines");
@@ -50,7 +69,10 @@ public class SerializerFromFile {
         return lines;
     }
 
-
+    /**
+     * This method creates a Json object from a text file with information about stations, lines, and transfers.
+     * @return Json object that describes all information about stations, transfers, and lines
+     */
     private JSONObject createJSONObject() throws JSONException {
         StringBuilder builder = new StringBuilder();
         try {

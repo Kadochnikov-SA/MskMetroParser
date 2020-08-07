@@ -1,5 +1,8 @@
 package com.company.metro;
 
+/**
+ * This class describes the metro line. Stores the index of the line and its name.
+ */
 public class Line {
 
     private String name;
